@@ -1,7 +1,22 @@
-import {Module, customModule, Styles, Panel, Label, customElements, ControlElement} from '@ijstech/components';
-import {IConfig} from './interface';
-
-const Theme = Styles.Theme.ThemeVars;
+import {
+  Module,
+  customModule,
+  Styles,
+  Panel,
+  Label,
+  customElements,
+  ControlElement,
+  Container,
+  Control,
+  Upload,
+  Image,
+  Input,
+  Link,
+  Modal,
+} from '@ijstech/components';
+import {IContentBlock} from './interface';
+import './index.css';
+import ScomContentBlockSelector from './selector';
 
 interface ScomContentBlockElement extends ControlElement {}
 
@@ -16,33 +31,42 @@ declare global {
 @customModule
 @customElements('i-scom-content-block')
 export default class ScomContentBlock extends Module {
-  private pnlCard: Panel;
-
-  private _data: IConfig = {};
-  tag: any;
+  private pnlEmpty: Panel;
+  private mdSelector: ScomContentBlockSelector;
 
   defaultEdit: boolean = true;
   readonly onConfirm: () => Promise<void>;
   readonly onDiscard: () => Promise<void>;
   readonly onEdit: () => Promise<void>;
 
-  getData() {
-    return this._data;
+  constructor(parent?: Container, options?: any) {
+    super(parent, options);
+    // if (scconfig) setDataFromSCConfig(scconfig);
   }
 
-  async setData(data: IConfig) {
-    this._data = data;
+  init() {
+    super.init();
+    // this.setTag({width: '100%', height: 'auto'});
   }
 
-  getTag() {
-    return this.tag;
-  }
-
-  async setTag(value: any) {
-    this.tag = value;
+  private onOpenSelector() {
+    this.mdSelector.onShow();
   }
 
   render() {
-    return <i-panel id="pnlBlock"></i-panel>;
+    return (
+      <i-panel>
+        <i-vstack class="content-block-wrapper">
+          <i-panel id={'pnlEmpty'} class="content-block-empty">
+            <i-button class="content-block-add-btn" onClick={this.onOpenSelector}>
+              <i-icon name="plus"></i-icon>
+            </i-button>
+            <i-scom-content-block-selector id={'mdSelector'}></i-scom-content-block-selector>
+          </i-panel>
+
+          <i-panel visible={false} class="content-block"></i-panel>
+        </i-vstack>
+      </i-panel>
+    );
   }
 }

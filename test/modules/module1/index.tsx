@@ -22,7 +22,7 @@ export default class Module1 extends Module {
     return (
       <i-panel>
         <i-hstack id="mainStack" margin={{top: '1rem', left: '1rem'}} gap="2rem">
-          <i-scom-content-block width={200} height={300}></i-scom-content-block>
+          <i-scom-content-block width={'33%'} height={'auto'}></i-scom-content-block>
         </i-hstack>
       </i-panel>
     );
