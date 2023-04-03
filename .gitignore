@@ -1,0 +1,7 @@
+.idea
+dist
+pluginTypes
+node_modules
+package-lock.json
+test/ref
+test/dist
