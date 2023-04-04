@@ -12,8 +12,8 @@ export default class Module1 extends Module {
     super.init();
     await ScomContentBlock.create(
       {
-        width: 300,
-        height: 200,
+        width: '33%',
+        height: 'auto',
       },
       this.mainStack,
     );
