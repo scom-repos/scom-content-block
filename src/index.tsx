@@ -39,6 +39,7 @@ export default class ScomContentBlock extends Module {
   private pnlContentBlock: Panel;
 
   private mdSelector: ScomContentBlockSelector;
+  private _component: any = null;
 
   defaultEdit: boolean = true;
   readonly onConfirm: () => Promise<void>;
@@ -90,6 +91,24 @@ export default class ScomContentBlock extends Module {
     this.fetchModule(element);
   }
 
+  private async setModule(module: Module) {
+    this._component = module;
+    this._component.parent = this.pnlContentBlock;
+    this.pnlContentBlock.append(this._component);
+    await this._component.ready();
+    this._component.maxWidth = '100%';
+    this._component.maxHeight = '100%';
+    this._component.overflow = 'hidden';
+    this._component.style.display = 'block';
+    this._component.addEventListener('click', (event: Event) => {
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      // this.toolList = this._component.getActions ? this._component.getActions() : [];
+      // this.checkToolbar();
+      // this.showToolbars();
+    });
+  }
+
   async fetchModule(data: IPageElement) {
     console.log('fetchModule: ', data);
     const ipfscid = data?.module?.ipfscid || '';
@@ -98,7 +117,7 @@ export default class ScomContentBlock extends Module {
       const module: any = await this.getEmbedElement({ipfscid, localPath});
       if (!module) throw new Error('Element not found');
       console.log('--------- module: ', module);
-      // await this.setModule(module);
+      await this.setModule(module);
       // if (this.isTexbox()) {
       //   this.dragStack.visible = true;
       //   this.contentStack.classList.remove('move');
@@ -115,12 +134,12 @@ export default class ScomContentBlock extends Module {
   getEmbedElement = async (options: IGetModuleOptions) => {
     let path: string = '';
     if (options.localPath) {
-      path = options.localPath;
+      path = `${options.localPath}/dist`;
     } else {
-      const response = await fetchFromIPFS(options.ipfscid);
-      const result = await response.json();
-      const codeCID = result.codeCID;
-      path = `${IPFS_GATEWAY_IJS}${codeCID}/dist`;
+      // const response = await fetchFromIPFS(options.ipfscid);
+      // const result = await response.json();
+      // const codeCID = result.codeCID;
+      // path = `${IPFS_GATEWAY_IJS}${codeCID}/dist`;
     }
     application.currentModuleDir = path;
     const result = await application.loadScript(`${path}/index.js`);
