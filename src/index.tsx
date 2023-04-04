@@ -95,7 +95,7 @@ export default class ScomContentBlock extends Module {
     this._component = module;
     this._component.parent = this.pnlContentBlock;
     this.pnlContentBlock.append(this._component);
-    await this._component.ready();
+    if (this._component.ready) await this._component.ready();
     this._component.maxWidth = '100%';
     this._component.maxHeight = '100%';
     this._component.overflow = 'hidden';
@@ -107,6 +107,8 @@ export default class ScomContentBlock extends Module {
       // this.checkToolbar();
       // this.showToolbars();
     });
+    this.pnlEmpty.visible = false;
+    this.pnlContentBlock.visible = true;
   }
 
   async fetchModule(data: IPageElement) {
@@ -134,7 +136,7 @@ export default class ScomContentBlock extends Module {
   getEmbedElement = async (options: IGetModuleOptions) => {
     let path: string = '';
     if (options.localPath) {
-      path = `${options.localPath}/dist`;
+      path = `${options.localPath}`;
     } else {
       // const response = await fetchFromIPFS(options.ipfscid);
       // const result = await response.json();
@@ -142,7 +144,7 @@ export default class ScomContentBlock extends Module {
       // path = `${IPFS_GATEWAY_IJS}${codeCID}/dist`;
     }
     application.currentModuleDir = path;
-    const result = await application.loadScript(`${path}/index.js`);
+    const result = await application.loadScript(`${path}/dist/index.js`);
     application.currentModuleDir = '';
     if (!result) return null;
     const elementName = `i-${path.split('/').pop()}`;
