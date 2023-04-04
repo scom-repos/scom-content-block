@@ -1,4 +1,5 @@
 import {IDataSchema} from '@ijstech/components';
+import {ELEMENT_TYPE} from './const';
 
 export interface ICommand {
   execute(): void;
@@ -70,4 +71,23 @@ export interface IContentBlock {
     color: string;
     link?: string;
   };
+}
+
+export interface IElementConfig {
+  module: IPageBlockData;
+  type: ELEMENT_TYPE;
+}
+
+export interface IPageElement {
+  id: string; // uuid
+  column: number;
+  columnSpan: number;
+  type: ELEMENT_TYPE;
+  tag?: any;
+  properties: any;
+  module?: IPageBlockData; // follow the standard defined in secure page, if type === 'primitive'
+  elements?: IPageElement[]; // type === 'composite'
+
+  visibleOn?: string;
+  invisibleOn?: string;
 }
