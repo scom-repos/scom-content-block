@@ -16,6 +16,6 @@
   "devDependencies": {
     "@ijstech/cli": "^0.1.28",
     "@ijstech/compiler": "^0.1.22",
-    "@ijstech/components": "^0.1.39"
+    "@ijstech/components": "^0.1.50"
   }
 }

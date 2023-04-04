@@ -5,12 +5,11 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@ijstech/components": "^0.1.47"
+    "@ijstech/components": "^0.1.50"
   },
   "devDependencies": {
     "@ijstech/cli": "^0.1.28",
-    "@ijstech/compiler": "^0.1.22",
-    "@scom/dapp": "^0.1.11",
+    "@ijstech/compiler": "^0.1.23",
     "@scom/scom-content-block": "file:./ref"
   },
   "scripts": {
