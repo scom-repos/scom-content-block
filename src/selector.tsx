@@ -137,10 +137,9 @@ export default class ScomContentBlockSelector extends Module {
   }
 
   private async getModules(category?: string): Promise<IPageBlockData[]> {
-    // const request = new Request(`${GET_PAGE_BLOCK_URL}${category ? `&categories=${category}` : ''}`);
-    // const response = await fetch(request);
-    // let data = (await response.json()) as IPageBlockData[];
-    let data = [];
+    const request = new Request(`${GET_PAGE_BLOCK_URL}${category ? `&categories=${category}` : ''}`);
+    const response = await fetch(request);
+    let data = (await response.json()) as IPageBlockData[];
     if (SHOW_DEV_PAGEBLOCK) {
       const devPageblocks: IPageBlockData[] = await this.getDevPageBlocks();
       data = [...data, ...devPageblocks];
