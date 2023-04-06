@@ -12,7 +12,7 @@ Styles.cssRule('i-scom-content-block', {
     },
 
     '.content-block-empty': {
-      minHeight: '325px',
+      minHeight: '120px',
       backgroundColor: 'rgba(0,0,0,.03)',
       outline: '2px dashed rgba(0,0,0,.1)',
 
