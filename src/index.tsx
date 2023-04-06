@@ -8,9 +8,10 @@ import {
   ControlElement,
   Container,
   application,
+  IDataSchema,
 } from '@ijstech/components';
 import {ELEMENT_NAME, EVENT, IPFS_GATEWAY_IJS} from './const';
-import {IElementConfig, IPageElement} from './interface';
+import {IElementConfig, IPageElement, PageBlock} from './interface';
 import ScomContentBlockSelector from './selector';
 import {getDappContainer} from './store';
 
@@ -34,17 +35,21 @@ declare global {
 
 @customModule
 @customElements('i-scom-content-block')
-export default class ScomContentBlock extends Module {
+export default class ScomContentBlock extends Module implements PageBlock {
   private pnlEmpty: Panel;
   private pnlContentBlock: Panel;
-
   private mdSelector: ScomContentBlockSelector;
   private _component: any = null;
 
+  private data = {};
   defaultEdit: boolean = true;
   readonly onConfirm: () => Promise<void>;
   readonly onDiscard: () => Promise<void>;
   readonly onEdit: () => Promise<void>;
+  validate?: () => boolean;
+  edit: () => Promise<void>;
+  confirm: () => Promise<void>;
+  discard: () => Promise<void>;
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
@@ -61,6 +66,130 @@ export default class ScomContentBlock extends Module {
       if (!data) return;
       this.onAddElement(data);
     });
+  }
+
+  getData() {
+    return this.data;
+  }
+
+  async setData(value) {
+    this.data = value;
+  }
+
+  getTag() {
+    return this.tag;
+  }
+
+  async setTag(value: any) {
+    this.tag = value;
+  }
+
+  getActions() {
+    const propertiesSchema: IDataSchema = {
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          minLength: 1,
+          required: true,
+        },
+        altText: {
+          type: 'string',
+        },
+        link: {
+          type: 'string',
+        },
+      },
+    };
+
+    const themeSchema: IDataSchema = {
+      type: 'object',
+      properties: {
+        backgroundColor: {
+          type: 'string',
+          format: 'color',
+        },
+        width: {
+          type: 'string',
+        },
+        height: {
+          type: 'string',
+        },
+      },
+    };
+
+    return this._getActions(propertiesSchema, themeSchema);
+  }
+
+  _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema) {
+    const actions = [
+      // {
+      //   name: 'Crop (Enter)',
+      //   icon: 'crop-alt',
+      //   command: (builder: any, userInputData: any) => {
+      //     return {
+      //       execute: () => {
+      //         if (!userInputData) return;
+      //         // if (!this.isReset) this.oldCropData = this.newCropData;
+      //         // this.newCropData = userInputData;
+      //         // this.onCrop(this.newCropData);
+      //         // if (builder?.setData) builder.setData(this.data);
+      //         // this.isReset = false;
+      //       },
+      //       undo: () => {
+      //         if (!userInputData) return;
+      //         // if (!this.oldCropData) {
+      //         //   this.img.url = this.data.url = this.originalUrl;
+      //         //   this.isReset = true;
+      //         // } else {
+      //         //   this.onCrop(this.oldCropData);
+      //         //   this.isReset = false;
+      //         // }
+      //         if (builder?.setData) builder.setData(this.data);
+      //       },
+      //       redo: () => {},
+      //     };
+      //   },
+      //   userInputDataSchema: {
+      //     type: 'object',
+      //     properties: {
+      //       x: {
+      //         type: 'integer',
+      //         required: true,
+      //       },
+      //       y: {
+      //         type: 'integer',
+      //         required: true,
+      //       },
+      //       width: {
+      //         type: 'integer',
+      //       },
+      //       height: {
+      //         type: 'integer',
+      //       },
+      //     },
+      //   } as IDataSchema,
+      // },
+      // {
+      //   name: 'Settings',
+      //   icon: 'cog',
+      //   command: (builder: any, userInputData: any) => {
+      //     return {
+      //       execute: () => {
+      //         if (builder?.setData) builder.setData(userInputData);
+      //         this.setData(userInputData);
+      //       },
+      //       undo: () => {
+      //         // if (builder?.setData) builder.setData(this.oldData);
+      //         // this.setData(this.oldData);
+      //       },
+      //       redo: () => {},
+      //     };
+      //   },
+      //   userInputDataSchema: settingSchema as IDataSchema,
+      // },
+    ];
+    return actions;
   }
 
   private async onAddElement(data: IElementConfig) {
