@@ -74,6 +74,7 @@ export interface IContentBlock {
 }
 
 export interface IElementConfig {
+  uuid: string;
   module: IPageBlockData;
   type: ELEMENT_TYPE;
 }

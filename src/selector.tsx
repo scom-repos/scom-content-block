@@ -105,6 +105,7 @@ export default class ScomContentBlockSelector extends Module {
 
   private pageBlocks: IPageBlockData[];
   private onSelectModule: (selectedModule: IPageBlockData) => Promise<void>;
+  private uuid: string;
 
   constructor(parent?: any) {
     super(parent);
@@ -116,7 +117,8 @@ export default class ScomContentBlockSelector extends Module {
     this.renderUI();
   }
 
-  onShow() {
+  onShow(uuid: string) {
+    this.uuid = uuid;
     this.mdSelector.visible = true;
   }
 
@@ -128,7 +130,7 @@ export default class ScomContentBlockSelector extends Module {
 
   private onAddComponent(module: IPageBlockData, type: ELEMENT_TYPE) {
     console.log('onAddComponent: ', {type, module});
-    application.EventBus.dispatch(EVENT.ON_ADD_ELEMENT, {type, module});
+    application.EventBus.dispatch(EVENT.ON_ADD_ELEMENT, {type, module, uuid: this.uuid});
     this.mdSelector.visible = false;
   }
 
