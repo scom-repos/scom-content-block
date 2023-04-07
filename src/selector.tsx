@@ -130,7 +130,7 @@ export default class ScomContentBlockSelector extends Module {
 
   private onAddComponent(module: IPageBlockData, type: ELEMENT_TYPE) {
     console.log('onAddComponent: ', {type, module});
-    application.EventBus.dispatch(EVENT.ON_ADD_ELEMENT, {type, module, uuid: this.uuid});
+    application.EventBus.dispatch(EVENT.ON_ADD_ELEMENT_CONTENT_BLOCK, {type, module, uuid: this.uuid});
     this.mdSelector.visible = false;
   }
 

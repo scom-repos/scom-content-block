@@ -42,7 +42,7 @@ export default class ScomSingleContentBlock extends Module {
   }
 
   initEventBus() {
-    application.EventBus.register(this, EVENT.ON_ADD_ELEMENT, (data: IElementConfig) => {
+    application.EventBus.register(this, EVENT.ON_ADD_ELEMENT_CONTENT_BLOCK, (data: IElementConfig) => {
       if (!data || data.uuid !== this.uuid) return;
       this.onAddElement(data);
     });
