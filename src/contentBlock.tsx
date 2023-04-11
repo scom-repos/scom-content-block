@@ -127,7 +127,7 @@ export default class ScomSingleContentBlock extends Module {
       // path = `${IPFS_GATEWAY_IJS}${codeCID}/dist`;
     }
     application.currentModuleDir = path;
-    const result = await application.loadScript(`${path}/dist/index.js`);
+    const result = await application.loadScript(`${path}/index.js`);
     application.currentModuleDir = '';
     if (!result) return null;
     const elementName = `i-${path.split('/').pop()}`;
