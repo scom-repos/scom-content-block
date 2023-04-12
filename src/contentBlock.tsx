@@ -85,9 +85,10 @@ export default class ScomSingleContentBlock extends Module {
     this._component.maxHeight = '100%';
     this._component.overflow = 'hidden';
     this._component.style.display = 'block';
-    application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions});
+    application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions.bind(this._component)});
     this._component.addEventListener('click', (event: Event) => {
       event.preventDefault();
+      application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions.bind(this._component)});
     });
     this.pnlEmpty.visible = false;
     this.pnlContentBlock.visible = true;
