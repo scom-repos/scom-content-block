@@ -55,22 +55,7 @@ export interface IPageBlockData {
 }
 
 export interface IContentBlock {
-  image: {
-    url: string;
-    altText?: string;
-    backgroundColor?: string;
-    link?: string;
-  };
-  heading: {
-    text: string;
-    color: string;
-    link?: string;
-  };
-  desc: {
-    text: string;
-    color: string;
-    link?: string;
-  };
+  numberOfBlocks?: number;
 }
 
 export interface IElementConfig {
