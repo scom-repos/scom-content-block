@@ -1,8 +1,18 @@
-import {Module, customModule, customElements, ControlElement, Container, IDataSchema, Panel} from '@ijstech/components';
+import {
+  Module,
+  customModule,
+  customElements,
+  ControlElement,
+  Container,
+  IDataSchema,
+  Panel,
+  application,
+} from '@ijstech/components';
 import {IContentBlock, PageBlock} from './interface';
 import ScomSingleContentBlock from './contentBlock';
 
 import './index.css';
+import {EVENT} from './const';
 
 interface ScomContentBlockElement extends ControlElement {
   numberOfBlocks?: number;
@@ -22,6 +32,8 @@ export default class ScomContentBlock extends Module implements PageBlock {
   private pnlContentBlocks: Panel;
 
   private contentBlocks: ScomSingleContentBlock[] = [];
+  private activeContentBlock: ScomSingleContentBlock;
+  private activeActions: any;
   private data: IContentBlock = {
     numberOfBlocks: 3,
   };
@@ -42,7 +54,14 @@ export default class ScomContentBlock extends Module implements PageBlock {
 
   init() {
     super.init();
+    this.initEventBus();
     this.renderContentBlocks();
+  }
+
+  initEventBus() {
+    application.EventBus.register(this, EVENT.ON_SET_ACTION_BLOCK, (data: {actions: any}) => {
+      this.activeActions = data.actions;
+    });
   }
 
   static async create(options?: ScomContentBlockElement, parent?: Container) {
@@ -89,6 +108,8 @@ export default class ScomContentBlock extends Module implements PageBlock {
   }
 
   getActions() {
+    if (this.activeActions) return this.activeActions();
+
     const propertiesSchema: IDataSchema = {
       type: 'object',
       properties: {
@@ -143,10 +164,23 @@ export default class ScomContentBlock extends Module implements PageBlock {
     return actions;
   }
 
+  private setContentBlock(activeContentBlock: any) {
+    this.activeContentBlock = activeContentBlock;
+    const contentBlocks = document.querySelectorAll('i-scom-single-content-block');
+    if (contentBlocks) {
+      for (const contentBlock of contentBlocks) {
+        contentBlock.classList.remove('active');
+      }
+      activeContentBlock.classList.add('active');
+    }
+  }
+
   async renderContentBlocks() {
     // this.clearRows();
     for (let i = 0; i < this.data.numberOfBlocks; i++) {
-      const contentBlock = (<i-scom-single-content-block></i-scom-single-content-block>) as ScomSingleContentBlock;
+      const contentBlock = (
+        <i-scom-single-content-block onClick={this.setContentBlock}></i-scom-single-content-block>
+      ) as ScomSingleContentBlock;
       this.contentBlocks.push(contentBlock);
       this.pnlContentBlocks.append(contentBlock);
     }

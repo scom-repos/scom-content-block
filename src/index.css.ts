@@ -6,6 +6,14 @@ Styles.cssRule('i-scom-content-block', {
   paddingRight: '3.75%',
 
   $nest: {
+    'i-scom-single-content-block.active': {
+      $nest: {
+        '.content-block-wrapper': {
+          border: `2px solid ${Theme.colors.primary.main}`,
+        },
+      },
+    },
+
     '.content-block-wrapper': {
       position: 'relative',
       width: '100%',
