@@ -38,20 +38,11 @@ export interface PageBlock {
 
 export interface IPageBlockData {
   name: string;
-  description: string;
-  ipfscid?: string;
+  path: string;
+  category?: "components" | "micro-dapps";
   imgUrl?: string;
-  category?: {
-    icon: string;
-    idx: string;
-    name: string;
-  }[];
-  chainId?: number;
-  packageId?: number;
-  projectId?: number;
-  local?: boolean;
-  localPath?: string;
-  dependencies?: any;
+  disableClicked?: boolean;
+  shownBackdrop?: boolean;
 }
 
 export interface IContentBlock {

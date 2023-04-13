@@ -150,30 +150,30 @@ export default class ScomContentBlockSelector extends Module {
   }
 
   private async renderUI() {
-    this.pageBlocks = await this.getModules('5');
+    this.pageBlocks = await this.getPageBlocks();
     setPageBlocks(this.pageBlocks);
     this.renderFirstStack();
     this.renderComponentList();
   }
 
+  async getPageBlocks() {
+      let rootDir =null;
+      let path = rootDir ? rootDir + "/scconfig.json" : "scconfig.json";
+      let content = await application.getContent(path);
+      let pageBlocks: IPageBlockData[] = [];
+      try {
+        let scconfig = JSON.parse(content);
+        let components = scconfig?.components || {};
+        for (let key in components) {
+          pageBlocks.push(components[key]);
+        }
+      } catch (err) {}
+      return pageBlocks;
+  }
+
   private async renderFirstStack() {
     this.firstStack.clearInnerHTML();
-    let components = [];
-    try {
-      const filterdModules = this.pageBlocks.filter(v => {
-        return (
-          v.name === '@PageBlock/Scom Image' || v.name === '@PageBlock/Markdown Editor' || v.name === 'Carousel (dev)'
-        );
-      });
-      for (let module of filterdModules) {
-        if (module.name === '@PageBlock/Scom Image') module.name = ELEMENT_NAME.IMAGE;
-        else if (module.name === '@PageBlock/Markdown Editor') module.name = ELEMENT_NAME.TEXTBOX;
-        else if (module.name === 'Carousel (dev)') module.name = 'Carousel (dev)';
-        components.push(module);
-      }
-    } catch {
-      components = [];
-    }
+    let components = this.pageBlocks.filter(p => p.category === 'components' && p.path !== 'scom-content-block');
     let matchedModules = components;
     for (const module of matchedModules) {
       const moduleCard = (
@@ -186,7 +186,7 @@ export default class ScomContentBlockSelector extends Module {
           gap="0.5rem"
           onClick={() => this.onAddComponent(module, ELEMENT_TYPE.PRIMITIVE)}>
           <i-panel>
-            <i-image url={module.imgUrl} width={24} height={24} display="block"></i-image>
+            <i-image url={module.imgUrl || "https://ipfs.scom.dev/ipfs/bafkreid4yhtwe3qz7lzvafzzt3q4ssdowzg2rpbrd6xqjanivyd7bkcsiy"} width={24} height={24} display="block"></i-image>
           </i-panel>
           <i-label caption={module.name}></i-label>
         </i-vstack>
@@ -197,31 +197,8 @@ export default class ScomContentBlockSelector extends Module {
 
   private async renderComponentList(keyword?: string) {
     this.componentsStack.clearInnerHTML();
-    let components = [];
-    const filterdModules = this.pageBlocks.filter(v => {
-      return ['@PageBlock/NFT Minter', '@PageBlock/Gem Token', '@PageBlock/Randomizer'].includes(v.name);
-    });
-    for (let module of filterdModules) {
-      if (module.name === '@PageBlock/NFT Minter') module.name = ELEMENT_NAME.NFT;
-      else if (module.name === '@PageBlock/Gem Token') module.name = ELEMENT_NAME.GEM_TOKEN;
-      else if (module.name === '@PageBlock/Randomizer') module.name = ELEMENT_NAME.RANDOMIZER;
-      components.push(module);
-    }
-    // For testing
-    components.push(imageModule);
-    components.push(textboxModule);
-    components.push(nftModule);
-    components.push(gemModule);
-    components.push(randomizerModule);
+    let components = this.pageBlocks.filter(p => p.category === 'micro-dapps');
     let matchedModules = components;
-    if (keyword) {
-      matchedModules = components.filter(v => {
-        return (
-          v.name.toLowerCase().indexOf(keyword.toLowerCase()) >= 0 ||
-          v.description.toLowerCase().indexOf(keyword.toLowerCase()) >= 0
-        );
-      });
-    }
     for (const module of matchedModules) {
       const moduleCard = (
         <i-hstack
@@ -232,7 +209,7 @@ export default class ScomContentBlockSelector extends Module {
           class="pointer"
           onClick={() => this.onAddComponent(module, ELEMENT_TYPE.PRIMITIVE)}>
           <i-panel>
-            <i-image url={module.imgUrl} width={24} height={24} display="block"></i-image>
+            <i-image url={module.imgUrl || "https://ipfs.scom.dev/ipfs/bafkreid4yhtwe3qz7lzvafzzt3q4ssdowzg2rpbrd6xqjanivyd7bkcsiy"} width={24} height={24} display="block"></i-image>
           </i-panel>
           <i-label caption={module.name} font={{weight: 600}}></i-label>
         </i-hstack>

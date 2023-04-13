@@ -5,17 +5,28 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@ijstech/components": "^0.1.50"
+    "@ijstech/components": "^0.1.50",
+    "@ijstech/eth-wallet": "0.1.50"
   },
   "devDependencies": {
     "@ijstech/cli": "^0.1.28",
     "@ijstech/compiler": "^0.1.23",
-    "@scom/scom-content-block": "file:./ref"
+    "@scom/scom-content-block": "file:./ref",
+    "@scom/scom-dapp-container": "0.1.1",
+    "@scom/scom-markdown-editor": "https://github.com/scom-repos/scom-markdown-editor",
+    "@scom/scom-image": "https://github.com/scom-repos/scom-image",
+    "@scom/scom-carousel": "https://github.com/scom-repos/scom-carousel",
+    "@scom/scom-banner": "https://github.com/scom-repos/scom-banner",
+    "@scom/scom-blog": "https://github.com/scom-repos/scom-blog",
+    "@scom/scom-nft-minter": "https://github.com/scom-repos/scom-nft-minter",
+    "@scom/scom-gem-token": "https://github.com/scom-repos/scom-gem-token",
+    "@scom/scom-randomizer": "https://github.com/scom-repos/scom-randomizer",
+    "@scom/scom-video": "https://github.com/scom-repos/scom-video",
+    "@scom/scom-map": "https://github.com/scom-repos/scom-map"
   },
   "scripts": {
     "cp:libs": "rm -rf ref && mkdir ref && cp ../package.json ref/package.json && cp -r ../dist ref/dist && cp -r ../pluginTypes ref/pluginTypes && cp -r ../pluginTypes ref/types",
-    "cp:local-pageblock": "if [ -d pageblocks ] ; then cp -r pageblocks dist/modules/pageblocks ; fi",
-    "build": "npm run cp:libs && rm -rf dist && npx @ijstech/compiler && npm run cp:local-pageblock",
+    "build": "npm run cp:libs && rm -rf dist && npx @ijstech/compiler && sh scripts/copy-pageblocks.sh",
     "serve": "npx @ijstech/cli serve 8080",
     "test": "npm run build && npm run serve"
   }
