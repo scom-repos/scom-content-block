@@ -22,5 +22,5 @@ export const getPageBlocks = () => {
 };
 
 export const getDappContainer = () => {
-  return (state.pageBlocks || []).find(pageblock => pageblock.name === '@PageBlock/Dapp Container');
+  return (state.pageBlocks || []).find(pageblock => pageblock.path === 'scom-dapp-container');
 };

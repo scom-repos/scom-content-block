@@ -67,7 +67,7 @@ define("@scom/scom-content-block/store.ts", ["require", "exports"], function (re
     };
     exports.getPageBlocks = getPageBlocks;
     const getDappContainer = () => {
-        return (exports.state.pageBlocks || []).find(pageblock => pageblock.name === '@PageBlock/Dapp Container');
+        return (exports.state.pageBlocks || []).find(pageblock => pageblock.path === 'scom-dapp-container');
     };
     exports.getDappContainer = getDappContainer;
 });
@@ -347,41 +347,46 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
             let element = {
                 id: utility_1.generateUUID(),
                 column: 1,
-                columnSpan: module.name === const_3.ELEMENT_NAME.TEXTBOX ? 12 : 3,
+                columnSpan: module.category === 'components' ? 12 : 3,
                 type,
                 module,
                 properties: {},
             };
-            if (module.name === const_3.ELEMENT_NAME.NFT || module.name === const_3.ELEMENT_NAME.GEM_TOKEN) {
+            if (module.path === 'scom-nft-minter' || module.path === 'scom-gem-token') {
                 element.module = store_2.getDappContainer();
                 element.columnSpan = 6;
                 element.properties = {
                     networks: [43113],
                     wallets: ['metamask'],
                     content: {
-                        module,
+                        module: Object.assign(Object.assign({}, module), { localPath: `libs/@scom/${module.path}` }),
                         properties: {
                             width: '100%',
                         },
                     },
                 };
             }
-            this.fetchModule(element);
+            await this.fetchModule(element);
+            await this._component.setData(element.properties);
         }
         async setModule(module) {
             this._component = module;
             this._component.parent = this.pnlContentBlock;
             this.pnlContentBlock.append(this._component);
+            if (this._component.setRootDir) {
+                const rootDir = store_2.getRootDir();
+                this._component.setRootDir(rootDir);
+            }
             if (this._component.ready)
                 await this._component.ready();
             this._component.maxWidth = '100%';
             this._component.maxHeight = '100%';
             this._component.overflow = 'hidden';
             this._component.style.display = 'block';
-            components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, { actions: this._component.getActions.bind(this._component) });
+            components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, { actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [] });
             this._component.addEventListener('click', (event) => {
                 event.preventDefault();
-                components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, { actions: this._component.getActions.bind(this._component) });
+                components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, { actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [] });
             });
             this.pnlEmpty.visible = false;
             this.pnlContentBlock.visible = true;

@@ -2,7 +2,7 @@ import {Module, customModule, Panel, customElements, ControlElement, Container, 
 import {ELEMENT_NAME, EVENT} from './const';
 import {IElementConfig, IPageElement} from './interface';
 import ScomContentBlockSelector from './selector';
-import {getDappContainer} from './store';
+import {getDappContainer, getRootDir} from './store';
 import {generateUUID} from './utility';
 
 import './index.css';
@@ -54,41 +54,46 @@ export default class ScomSingleContentBlock extends Module {
     let element: IPageElement = {
       id: generateUUID(),
       column: 1,
-      columnSpan: module.name === ELEMENT_NAME.TEXTBOX ? 12 : 3,
+      columnSpan: module.category === 'components' ? 12 : 3,
       type,
       module,
       properties: {} as any,
     };
-    if (module.name === ELEMENT_NAME.NFT || module.name === ELEMENT_NAME.GEM_TOKEN) {
+    if (module.path === 'scom-nft-minter' || module.path === 'scom-gem-token') {
       element.module = getDappContainer();
       element.columnSpan = 6;
       element.properties = {
         networks: [43113],
         wallets: ['metamask'],
         content: {
-          module,
+          module: { ...module, localPath: `libs/@scom/${module.path}` },
           properties: {
             width: '100%',
           },
         },
       };
     }
-    this.fetchModule(element);
+    await this.fetchModule(element);
+    if (this._component) await this._component.setData(element.properties);
   }
 
   private async setModule(module: Module) {
     this._component = module;
     this._component.parent = this.pnlContentBlock;
     this.pnlContentBlock.append(this._component);
+    if (this._component.setRootDir) {
+        const rootDir = getRootDir();
+        this._component.setRootDir(rootDir);
+    }
     if (this._component.ready) await this._component.ready();
     this._component.maxWidth = '100%';
     this._component.maxHeight = '100%';
     this._component.overflow = 'hidden';
     this._component.style.display = 'block';
-    application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions.bind(this._component)});
+    application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => []});
     this._component.addEventListener('click', (event: Event) => {
       event.preventDefault();
-      application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions.bind(this._component)});
+      application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => []});
     });
     this.pnlEmpty.visible = false;
     this.pnlContentBlock.visible = true;
