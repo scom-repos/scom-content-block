@@ -8,11 +8,12 @@ import {
   Panel,
   application,
 } from '@ijstech/components';
-import {IContentBlock, PageBlock} from './interface';
+import { IContentBlock, IPageBlockData, PageBlock } from './interface';
 import ScomSingleContentBlock from './contentBlock';
 
 import './index.css';
-import {EVENT} from './const';
+import { EVENT } from './const';
+import { getRootDir, setPageBlocks, setRootDir } from './store';
 
 interface ScomContentBlockElement extends ControlElement {
   numberOfBlocks?: number;
@@ -56,6 +57,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
   init() {
     super.init();
     this.initEventBus();
+    this.setPageBlocks();
     this.renderContentBlocks();
 
     this.pnlContentBlocks.addEventListener('click', e => {
@@ -65,7 +67,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
   }
 
   initEventBus() {
-    application.EventBus.register(this, EVENT.ON_SET_ACTION_BLOCK, (data: {actions: any}) => {
+    application.EventBus.register(this, EVENT.ON_SET_ACTION_BLOCK, (data: { actions: any }) => {
       this.activeActions = data.actions;
       this.isBlockActive = true;
       application.EventBus.dispatch(EVENT.ON_UPDATE_TOOLBAR);
@@ -111,6 +113,31 @@ export default class ScomContentBlock extends Module implements PageBlock {
 
   async setTag(value: any) {
     this.tag = value;
+  }
+
+  setRootDir(value: string) {
+    setRootDir(value || "");
+    this.setPageBlocks();
+  }
+
+  async setPageBlocks() {
+    const pageBlocks = await this.getPageBlocks();
+    setPageBlocks(pageBlocks);
+  }
+
+  async getPageBlocks() {
+    let rootDir = getRootDir();
+    let path = rootDir ? rootDir + "/scconfig.json" : "scconfig.json";
+    let pageBlocks: IPageBlockData[] = [];
+    try {
+      let content = await application.getContent(path);
+      let scconfig = JSON.parse(content);
+      let components = scconfig?.components || {};
+      for (let key in components) {
+        pageBlocks.push(components[key]);
+      }
+    } catch (err) { }
+    return pageBlocks;
   }
 
   checkValidation(value: IContentBlock): boolean {
@@ -165,7 +192,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
               // if (builder?.setData) builder.setData(this.oldData);
               // this.setData(this.oldData);
             },
-            redo: () => {},
+            redo: () => { },
           };
         },
         userInputDataSchema: settingSchema as IDataSchema,

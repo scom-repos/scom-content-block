@@ -13,7 +13,7 @@ import {
 } from '@ijstech/components';
 import './selector.css';
 import {IPageBlockData} from './interface';
-import {setPageBlocks} from './store';
+import {getPageBlocks} from './store';
 import {ELEMENT_NAME, ELEMENT_TYPE, EVENT} from './const';
 
 const Theme = Styles.Theme.ThemeVars;
@@ -114,11 +114,11 @@ export default class ScomContentBlockSelector extends Module {
   init() {
     this.onSelectModule = this.getAttribute('onSelectModule', true);
     super.init();
-    this.renderUI();
   }
 
   onShow(uuid: string) {
     this.uuid = uuid;
+    this.renderUI();
     this.mdSelector.visible = true;
   }
 
@@ -150,25 +150,9 @@ export default class ScomContentBlockSelector extends Module {
   }
 
   private async renderUI() {
-    this.pageBlocks = await this.getPageBlocks();
-    setPageBlocks(this.pageBlocks);
+    this.pageBlocks = getPageBlocks();
     this.renderFirstStack();
     this.renderComponentList();
-  }
-
-  async getPageBlocks() {
-      let rootDir =null;
-      let path = rootDir ? rootDir + "/scconfig.json" : "scconfig.json";
-      let content = await application.getContent(path);
-      let pageBlocks: IPageBlockData[] = [];
-      try {
-        let scconfig = JSON.parse(content);
-        let components = scconfig?.components || {};
-        for (let key in components) {
-          pageBlocks.push(components[key]);
-        }
-      } catch (err) {}
-      return pageBlocks;
   }
 
   private async renderFirstStack() {

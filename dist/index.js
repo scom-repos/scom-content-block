@@ -45,11 +45,19 @@ define("@scom/scom-content-block/selector.css.ts", ["require", "exports", "@ijst
 define("@scom/scom-content-block/store.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getDappContainer = exports.getPageBlocks = exports.setPageBlocks = exports.state = void 0;
+    exports.getDappContainer = exports.getPageBlocks = exports.setPageBlocks = exports.getRootDir = exports.setRootDir = exports.state = void 0;
     exports.state = {
         pageBlocks: [],
         rootDir: '',
     };
+    const setRootDir = (value) => {
+        exports.state.rootDir = value || "";
+    };
+    exports.setRootDir = setRootDir;
+    const getRootDir = () => {
+        return exports.state.rootDir;
+    };
+    exports.getRootDir = getRootDir;
     const setPageBlocks = (value) => {
         exports.state.pageBlocks = value || [];
     };
@@ -126,10 +134,10 @@ define("@scom/scom-content-block/selector.tsx", ["require", "exports", "@ijstech
         init() {
             this.onSelectModule = this.getAttribute('onSelectModule', true);
             super.init();
-            this.renderUI();
         }
         onShow(uuid) {
             this.uuid = uuid;
+            this.renderUI();
             this.mdSelector.visible = true;
         }
         onToggleBlock(source) {
@@ -156,25 +164,9 @@ define("@scom/scom-content-block/selector.tsx", ["require", "exports", "@ijstech
             return data;
         }
         async renderUI() {
-            this.pageBlocks = await this.getPageBlocks();
-            store_1.setPageBlocks(this.pageBlocks);
+            this.pageBlocks = store_1.getPageBlocks();
             this.renderFirstStack();
             this.renderComponentList();
-        }
-        async getPageBlocks() {
-            let rootDir = null;
-            let path = rootDir ? rootDir + "/scconfig.json" : "scconfig.json";
-            let content = await components_2.application.getContent(path);
-            let pageBlocks = [];
-            try {
-                let scconfig = JSON.parse(content);
-                let components = (scconfig === null || scconfig === void 0 ? void 0 : scconfig.components) || {};
-                for (let key in components) {
-                    pageBlocks.push(components[key]);
-                }
-            }
-            catch (err) { }
-            return pageBlocks;
         }
         async renderFirstStack() {
             this.firstStack.clearInnerHTML();
@@ -435,7 +427,7 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
     ], ScomSingleContentBlock);
     exports.default = ScomSingleContentBlock;
 });
-define("@scom/scom-content-block", ["require", "exports", "@ijstech/components", "@scom/scom-content-block/const.ts", "@scom/scom-content-block/index.css.ts"], function (require, exports, components_5, const_4) {
+define("@scom/scom-content-block", ["require", "exports", "@ijstech/components", "@scom/scom-content-block/const.ts", "@scom/scom-content-block/store.ts", "@scom/scom-content-block/index.css.ts"], function (require, exports, components_5, const_4, store_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let ScomContentBlock = class ScomContentBlock extends components_5.Module {
@@ -451,6 +443,7 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         init() {
             super.init();
             this.initEventBus();
+            this.setPageBlocks();
             this.renderContentBlocks();
             this.pnlContentBlocks.addEventListener('click', e => {
                 if (!this.isBlockActive)
@@ -500,6 +493,29 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         }
         async setTag(value) {
             this.tag = value;
+        }
+        setRootDir(value) {
+            store_3.setRootDir(value || "");
+            this.setPageBlocks();
+        }
+        async setPageBlocks() {
+            const pageBlocks = await this.getPageBlocks();
+            store_3.setPageBlocks(pageBlocks);
+        }
+        async getPageBlocks() {
+            let rootDir = store_3.getRootDir();
+            let path = rootDir ? rootDir + "/scconfig.json" : "scconfig.json";
+            let pageBlocks = [];
+            try {
+                let content = await components_5.application.getContent(path);
+                let scconfig = JSON.parse(content);
+                let components = (scconfig === null || scconfig === void 0 ? void 0 : scconfig.components) || {};
+                for (let key in components) {
+                    pageBlocks.push(components[key]);
+                }
+            }
+            catch (err) { }
+            return pageBlocks;
         }
         checkValidation(value) {
             return value.numberOfBlocks > 0;
