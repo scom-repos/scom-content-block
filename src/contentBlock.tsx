@@ -96,8 +96,10 @@ export default class ScomSingleContentBlock extends Module {
 
   async fetchModule(data: IPageElement) {
     console.log('fetchModule: ', data);
+    const ipfscid = data?.module?.ipfscid || '';
+    const localPath = data?.module?.localPath || '';
     try {
-      const module: any = await this.getEmbedElement(data?.module?.path || '');
+      const module: any = await this.getEmbedElement({ipfscid, localPath});
       if (!module) throw new Error('Element not found');
       await this.setModule(module);
       // if (this.isTexbox()) {
@@ -113,9 +115,18 @@ export default class ScomSingleContentBlock extends Module {
     }
   }
 
-  getEmbedElement = async (path: string) => {
+  getEmbedElement = async (options: IGetModuleOptions) => {
+    let path: string = '';
+    if (options.localPath) {
+      path = `${options.localPath}`;
+    } else {
+      // const response = await fetchFromIPFS(options.ipfscid);
+      // const result = await response.json();
+      // const codeCID = result.codeCID;
+      // path = `${IPFS_GATEWAY_IJS}${codeCID}/dist`;
+    }
     application.currentModuleDir = path;
-    const result = await application.loadScript(`libs/@scom/${path}/index.js`);
+    const result = await application.loadScript(`${path}/index.js`);
     application.currentModuleDir = '';
     if (!result) return null;
     const elementName = `i-${path.split('/').pop()}`;
