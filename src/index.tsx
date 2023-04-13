@@ -34,6 +34,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
   private contentBlocks: ScomSingleContentBlock[] = [];
   private activeContentBlock: ScomSingleContentBlock;
   private activeActions: any;
+  private isBlockActive: boolean;
   private data: IContentBlock = {
     numberOfBlocks: 3,
   };
@@ -57,15 +58,16 @@ export default class ScomContentBlock extends Module implements PageBlock {
     this.initEventBus();
     this.renderContentBlocks();
 
-    document.addEventListener('click', e => {
-      // Clicked outside the box
-      if (!this.contains(e.target as HTMLElement)) this.resetActions();
+    this.pnlContentBlocks.addEventListener('click', e => {
+      if (!this.isBlockActive) this.resetActions();
+      this.isBlockActive = false;
     });
   }
 
   initEventBus() {
     application.EventBus.register(this, EVENT.ON_SET_ACTION_BLOCK, (data: {actions: any}) => {
       this.activeActions = data.actions;
+      this.isBlockActive = true;
       application.EventBus.dispatch(EVENT.ON_UPDATE_TOOLBAR);
     });
   }
@@ -200,6 +202,6 @@ export default class ScomContentBlock extends Module implements PageBlock {
   }
 
   render() {
-    return <i-panel id={'pnlContentBlocks'} class="content-block-pnl" onClick={this.resetActions}></i-panel>;
+    return <i-panel id={'pnlContentBlocks'} class="content-block-pnl"></i-panel>;
   }
 }
