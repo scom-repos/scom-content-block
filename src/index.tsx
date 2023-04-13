@@ -56,11 +56,17 @@ export default class ScomContentBlock extends Module implements PageBlock {
     super.init();
     this.initEventBus();
     this.renderContentBlocks();
+
+    document.addEventListener('click', e => {
+      // Clicked outside the box
+      if (!this.contains(e.target as HTMLElement)) this.resetActions();
+    });
   }
 
   initEventBus() {
     application.EventBus.register(this, EVENT.ON_SET_ACTION_BLOCK, (data: {actions: any}) => {
       this.activeActions = data.actions;
+      application.EventBus.dispatch(EVENT.ON_UPDATE_TOOLBAR);
     });
   }
 
@@ -88,7 +94,9 @@ export default class ScomContentBlock extends Module implements PageBlock {
       }
     } else {
       for (let i = 0; i < Math.abs(delta); i++) {
-        const contentBlock = (<i-scom-single-content-block></i-scom-single-content-block>) as ScomSingleContentBlock;
+        const contentBlock = (
+          <i-scom-single-content-block onClick={this.setContentBlock}></i-scom-single-content-block>
+        ) as ScomSingleContentBlock;
         this.contentBlocks.push(contentBlock);
         this.pnlContentBlocks.append(contentBlock);
       }
@@ -186,7 +194,12 @@ export default class ScomContentBlock extends Module implements PageBlock {
     }
   }
 
+  resetActions() {
+    this.activeActions = null;
+    application.EventBus.dispatch(EVENT.ON_UPDATE_TOOLBAR);
+  }
+
   render() {
-    return <i-panel id={'pnlContentBlocks'}></i-panel>;
+    return <i-panel id={'pnlContentBlocks'} class="content-block-pnl" onClick={this.resetActions}></i-panel>;
   }
 }

@@ -2,10 +2,12 @@ import {Styles} from '@ijstech/components';
 const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('i-scom-content-block', {
-  paddingLeft: '3.75%',
-  paddingRight: '3.75%',
-
   $nest: {
+    '.content-block-pnl': {
+      paddingLeft: '3.75%',
+      paddingRight: '3.75%',
+    },
+
     'i-scom-single-content-block.active': {
       $nest: {
         '.content-block-wrapper': {
