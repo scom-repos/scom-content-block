@@ -11,8 +11,7 @@
     "declaration": false,
     "baseUrl": ".",
     "paths": {
-      "@ijstech/components": ["node_modules/@ijstech/components"],
-      "@modules/*": ["modules/*"],
+      "@modules/*":["modules/*"],
       "@scom/scom-content-block": ["ref"]
     }
   },

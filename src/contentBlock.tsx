@@ -74,7 +74,7 @@ export default class ScomSingleContentBlock extends Module {
       };
     }
     await this.fetchModule(element);
-    if (this._component) await this._component.setData(element.properties);
+    if (this._component.setData) await this._component.setData(element.properties);
   }
 
   private async setModule(module: Module) {

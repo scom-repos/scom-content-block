@@ -367,7 +367,8 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
                 };
             }
             await this.fetchModule(element);
-            await this._component.setData(element.properties);
+            if (this._component.setData)
+                await this._component.setData(element.properties);
         }
         async setModule(module) {
             this._component = module;

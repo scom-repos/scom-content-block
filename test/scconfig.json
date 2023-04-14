@@ -7,6 +7,8 @@
     }
   },
   "dependencies": {
+    "@ijstech/eth-contract": "*",
+    "@ijstech/eth-wallet": "*",
     "@scom/scom-content-block": "*"
   },
   "components": {
