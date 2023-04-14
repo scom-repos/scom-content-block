@@ -600,6 +600,7 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         }
         resetActions() {
             this.activeActions = null;
+            this.activeContentBlock.classList.remove('active');
             components_5.application.EventBus.dispatch(const_4.EVENT.ON_UPDATE_TOOLBAR);
         }
         render() {

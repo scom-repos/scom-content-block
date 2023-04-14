@@ -225,6 +225,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
 
   resetActions() {
     this.activeActions = null;
+    this.activeContentBlock.classList.remove('active');
     application.EventBus.dispatch(EVENT.ON_UPDATE_TOOLBAR);
   }
 
