@@ -2,7 +2,6 @@
 declare module "@scom/scom-content-block/const.ts" {
     export const EVENT: {
         ON_ADD_ELEMENT_CONTENT_BLOCK: string;
-        ON_APPEND_MODULE_CONTENT_BLOCK: string;
         ON_SET_ACTION_BLOCK: string;
         ON_UPDATE_TOOLBAR: string;
     };
