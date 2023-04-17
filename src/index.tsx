@@ -8,12 +8,12 @@ import {
   Panel,
   application,
 } from '@ijstech/components';
-import { IContentBlock, IPageBlockData, PageBlock } from './interface';
+import {IContentBlock, IPageBlockData, IPageElement, PageBlock} from './interface';
 import ScomSingleContentBlock from './contentBlock';
 
 import './index.css';
-import { EVENT } from './const';
-import { getRootDir, setPageBlocks, setRootDir } from './store';
+import {EVENT} from './const';
+import {getRootDir, setPageBlocks, setRootDir} from './store';
 
 interface ScomContentBlockElement extends ControlElement {
   numberOfBlocks?: number;
@@ -38,6 +38,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
   private isBlockActive: boolean;
   private data: IContentBlock = {
     numberOfBlocks: 3,
+    dataProperties: [],
   };
 
   defaultEdit: boolean = true;
@@ -60,6 +61,11 @@ export default class ScomContentBlock extends Module implements PageBlock {
     this.setPageBlocks();
     this.renderContentBlocks();
 
+    document.addEventListener('click', e => {
+      // Clicked outside the content-block
+      if (!this.contains(e.target as HTMLElement)) this.resetActions();
+    });
+
     this.pnlContentBlocks.addEventListener('click', e => {
       if (!this.isBlockActive) this.resetActions();
       this.isBlockActive = false;
@@ -67,11 +73,16 @@ export default class ScomContentBlock extends Module implements PageBlock {
   }
 
   initEventBus() {
-    application.EventBus.register(this, EVENT.ON_SET_ACTION_BLOCK, (data: { actions: any }) => {
-      this.activeActions = data.actions;
-      this.isBlockActive = true;
-      application.EventBus.dispatch(EVENT.ON_UPDATE_TOOLBAR);
-    });
+    application.EventBus.register(
+      this,
+      EVENT.ON_SET_ACTION_BLOCK,
+      (data: {id: string; element: IPageElement; actions: any}) => {
+        const {id, element, actions} = data;
+        this.activeActions = actions;
+        this.isBlockActive = true;
+        application.EventBus.dispatch(EVENT.ON_UPDATE_TOOLBAR);
+      },
+    );
   }
 
   static async create(options?: ScomContentBlockElement, parent?: Container) {
@@ -97,14 +108,18 @@ export default class ScomContentBlock extends Module implements PageBlock {
         }
       }
     } else {
+      const initIndex = this.contentBlocks.length;
       for (let i = 0; i < Math.abs(delta); i++) {
         const contentBlock = (
-          <i-scom-single-content-block onClick={this.setContentBlock}></i-scom-single-content-block>
+          <i-scom-single-content-block
+            id={`single-content-block__${initIndex + i}`}
+            onClick={this.setContentBlock}></i-scom-single-content-block>
         ) as ScomSingleContentBlock;
         this.contentBlocks.push(contentBlock);
         this.pnlContentBlocks.append(contentBlock);
       }
     }
+    this.data.dataProperties.length = this.data.numberOfBlocks;
   }
 
   getTag() {
@@ -116,7 +131,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
   }
 
   setRootDir(value: string) {
-    setRootDir(value || "");
+    setRootDir(value || '');
     this.setPageBlocks();
   }
 
@@ -127,7 +142,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
 
   async getPageBlocks() {
     let rootDir = getRootDir();
-    let path = rootDir ? rootDir + "/scconfig.json" : "scconfig.json";
+    let path = rootDir ? rootDir + '/scconfig.json' : 'scconfig.json';
     let pageBlocks: IPageBlockData[] = [];
     try {
       let content = await application.getContent(path);
@@ -136,7 +151,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
       for (let key in components) {
         pageBlocks.push(components[key]);
       }
-    } catch (err) { }
+    } catch (err) {}
     return pageBlocks;
   }
 
@@ -185,14 +200,15 @@ export default class ScomContentBlock extends Module implements PageBlock {
         command: (builder: any, userInputData: any) => {
           return {
             execute: () => {
+              console.log('--------- Settings command: ', builder, userInputData);
               if (builder?.setData) builder.setData(userInputData);
-              this.setData(userInputData);
+              this.setData({...this.data, ...userInputData});
             },
             undo: () => {
               // if (builder?.setData) builder.setData(this.oldData);
               // this.setData(this.oldData);
             },
-            redo: () => { },
+            redo: () => {},
           };
         },
         userInputDataSchema: settingSchema as IDataSchema,
@@ -216,7 +232,9 @@ export default class ScomContentBlock extends Module implements PageBlock {
     // this.clearRows();
     for (let i = 0; i < this.data.numberOfBlocks; i++) {
       const contentBlock = (
-        <i-scom-single-content-block onClick={this.setContentBlock}></i-scom-single-content-block>
+        <i-scom-single-content-block
+          id={`single-content-block__${i}`}
+          onClick={this.setContentBlock}></i-scom-single-content-block>
       ) as ScomSingleContentBlock;
       this.contentBlocks.push(contentBlock);
       this.pnlContentBlocks.append(contentBlock);

@@ -2,6 +2,7 @@
 declare module "@scom/scom-content-block/const.ts" {
     export const EVENT: {
         ON_ADD_ELEMENT_CONTENT_BLOCK: string;
+        ON_APPEND_MODULE_CONTENT_BLOCK: string;
         ON_SET_ACTION_BLOCK: string;
         ON_UPDATE_TOOLBAR: string;
     };
@@ -53,13 +54,14 @@ declare module "@scom/scom-content-block/interface.ts" {
     export interface IPageBlockData {
         name: string;
         path: string;
-        category?: "components" | "micro-dapps";
+        category?: 'components' | 'micro-dapps';
         imgUrl?: string;
         disableClicked?: boolean;
         shownBackdrop?: boolean;
     }
     export interface IContentBlock {
         numberOfBlocks?: number;
+        dataProperties: IPageElement[];
     }
     export interface IElementConfig {
         uuid: string;
@@ -161,7 +163,7 @@ declare module "@scom/scom-content-block/contentBlock.tsx" {
         initEventBus(): void;
         private onAddElement;
         private setModule;
-        fetchModule(data: IPageElement): Promise<void>;
+        fetchModule(element: IPageElement): Promise<void>;
         getEmbedElement: (path: string) => Promise<HTMLElement>;
         private onOpenSelector;
         render(): any;

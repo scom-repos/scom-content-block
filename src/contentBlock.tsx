@@ -39,6 +39,10 @@ export default class ScomSingleContentBlock extends Module {
   init() {
     super.init();
     this.initEventBus();
+
+    // this.addEventListener('mouseenter', e => {
+    //   console.log('this.id: ', this.id);
+    // });
   }
 
   initEventBus() {
@@ -49,7 +53,6 @@ export default class ScomSingleContentBlock extends Module {
   }
 
   private async onAddElement(data: IElementConfig) {
-    console.log('onAddElement: ', data);
     const {type, module} = data;
     let element: IPageElement = {
       id: generateUUID(),
@@ -66,7 +69,7 @@ export default class ScomSingleContentBlock extends Module {
         networks: [43113],
         wallets: ['metamask'],
         content: {
-          module: { ...module, localPath: `libs/@scom/${module.path}` },
+          module: {...module, localPath: `libs/@scom/${module.path}`},
           properties: {
             width: '100%',
           },
@@ -77,34 +80,44 @@ export default class ScomSingleContentBlock extends Module {
     if (this._component.setData) await this._component.setData(element.properties);
   }
 
-  private async setModule(module: Module) {
+  private async setModule(module: Module, element: IPageElement) {
     this._component = module;
     this._component.parent = this.pnlContentBlock;
     this.pnlContentBlock.append(this._component);
     if (this._component.setRootDir) {
-        const rootDir = getRootDir();
-        this._component.setRootDir(rootDir);
+      const rootDir = getRootDir();
+      this._component.setRootDir(rootDir);
     }
     if (this._component.ready) await this._component.ready();
     this._component.maxWidth = '100%';
     this._component.maxHeight = '100%';
     this._component.overflow = 'hidden';
     this._component.style.display = 'block';
-    application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => []});
+
+    const id = this.id;
+    application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {
+      id,
+      element,
+      actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
+    });
     this._component.addEventListener('click', (event: Event) => {
       event.preventDefault();
-      application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => []});
+      application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {
+        id,
+        element,
+        actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
+      });
     });
     this.pnlEmpty.visible = false;
     this.pnlContentBlock.visible = true;
   }
 
-  async fetchModule(data: IPageElement) {
-    console.log('fetchModule: ', data);
+  async fetchModule(element: IPageElement) {
+    console.log('fetchModule: ', element);
     try {
-      const module: any = await this.getEmbedElement(data?.module?.path || '');
+      const module: any = await this.getEmbedElement(element?.module?.path || '');
       if (!module) throw new Error('Element not found');
-      await this.setModule(module);
+      await this.setModule(module, element);
       // if (this.isTexbox()) {
       //   this.dragStack.visible = true;
       //   this.contentStack.classList.remove('move');
