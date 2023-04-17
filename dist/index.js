@@ -11,6 +11,7 @@ define("@scom/scom-content-block/const.ts", ["require", "exports"], function (re
     ///<amd-module name='@scom/scom-content-block/const.ts'/> 
     exports.EVENT = {
         ON_ADD_ELEMENT_CONTENT_BLOCK: 'ON_ADD_ELEMENT_CONTENT_BLOCK',
+        ON_APPEND_MODULE_CONTENT_BLOCK: 'ON_APPEND_MODULE_CONTENT_BLOCK',
         ON_SET_ACTION_BLOCK: 'ON_SET_ACTION_BLOCK',
         ON_UPDATE_TOOLBAR: 'ON_UPDATE_TOOLBAR'
     };
@@ -333,6 +334,9 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
         init() {
             super.init();
             this.initEventBus();
+            // this.addEventListener('mouseenter', e => {
+            //   console.log('this.id: ', this.id);
+            // });
         }
         initEventBus() {
             components_4.application.EventBus.register(this, const_3.EVENT.ON_ADD_ELEMENT_CONTENT_BLOCK, (data) => {
@@ -342,7 +346,6 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
             });
         }
         async onAddElement(data) {
-            console.log('onAddElement: ', data);
             const { type, module } = data;
             let element = {
                 id: utility_1.generateUUID(),
@@ -370,7 +373,7 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
             if (this._component.setData)
                 await this._component.setData(element.properties);
         }
-        async setModule(module) {
+        async setModule(module, element) {
             this._component = module;
             this._component.parent = this.pnlContentBlock;
             this.pnlContentBlock.append(this._component);
@@ -384,22 +387,31 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
             this._component.maxHeight = '100%';
             this._component.overflow = 'hidden';
             this._component.style.display = 'block';
-            components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, { actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [] });
+            const id = this.id;
+            components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, {
+                id,
+                element,
+                actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
+            });
             this._component.addEventListener('click', (event) => {
                 event.preventDefault();
-                components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, { actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [] });
+                components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, {
+                    id,
+                    element,
+                    actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
+                });
             });
             this.pnlEmpty.visible = false;
             this.pnlContentBlock.visible = true;
         }
-        async fetchModule(data) {
+        async fetchModule(element) {
             var _a;
-            console.log('fetchModule: ', data);
+            console.log('fetchModule: ', element);
             try {
-                const module = await this.getEmbedElement(((_a = data === null || data === void 0 ? void 0 : data.module) === null || _a === void 0 ? void 0 : _a.path) || '');
+                const module = await this.getEmbedElement(((_a = element === null || element === void 0 ? void 0 : element.module) === null || _a === void 0 ? void 0 : _a.path) || '');
                 if (!module)
                     throw new Error('Element not found');
-                await this.setModule(module);
+                await this.setModule(module, element);
                 // if (this.isTexbox()) {
                 //   this.dragStack.visible = true;
                 //   this.contentStack.classList.remove('move');
@@ -442,6 +454,7 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
             this.contentBlocks = [];
             this.data = {
                 numberOfBlocks: 3,
+                dataProperties: [],
             };
             this.defaultEdit = true;
             // if (scconfig) setDataFromSCConfig(scconfig);
@@ -451,6 +464,11 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
             this.initEventBus();
             this.setPageBlocks();
             this.renderContentBlocks();
+            document.addEventListener('click', e => {
+                // Clicked outside the content-block
+                if (!this.contains(e.target))
+                    this.resetActions();
+            });
             this.pnlContentBlocks.addEventListener('click', e => {
                 if (!this.isBlockActive)
                     this.resetActions();
@@ -459,10 +477,15 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         }
         initEventBus() {
             components_5.application.EventBus.register(this, const_4.EVENT.ON_SET_ACTION_BLOCK, (data) => {
-                this.activeActions = data.actions;
+                const { id, element, actions } = data;
+                this.activeActions = actions;
                 this.isBlockActive = true;
                 components_5.application.EventBus.dispatch(const_4.EVENT.ON_UPDATE_TOOLBAR);
             });
+            // application.EventBus.register(this, EVENT.ON_APPEND_MODULE_CONTENT_BLOCK, (data: {index: number; element: any}) => {
+            //   const {index, element} = data;
+            //   if (!isNaN(index) && index > -1) this.data.dataProperties[index] = element;
+            // });
         }
         static async create(options, parent) {
             let self = new this(parent, options);
@@ -473,6 +496,7 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
             return this.data;
         }
         async setData(value) {
+            console.log('---------------- setData: ', value);
             if (!this.checkValidation(value))
                 return;
             this.data = value;
@@ -487,12 +511,14 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
                 }
             }
             else {
+                const initIndex = this.contentBlocks.length;
                 for (let i = 0; i < Math.abs(delta); i++) {
-                    const contentBlock = (this.$render("i-scom-single-content-block", { onClick: this.setContentBlock }));
+                    const contentBlock = (this.$render("i-scom-single-content-block", { id: `single-content-block__${initIndex + i}`, onClick: this.setContentBlock }));
                     this.contentBlocks.push(contentBlock);
                     this.pnlContentBlocks.append(contentBlock);
                 }
             }
+            this.data.dataProperties.length = this.data.numberOfBlocks;
         }
         getTag() {
             return this.tag;
@@ -501,7 +527,7 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
             this.tag = value;
         }
         setRootDir(value) {
-            store_3.setRootDir(value || "");
+            store_3.setRootDir(value || '');
             this.setPageBlocks();
         }
         async setPageBlocks() {
@@ -510,7 +536,7 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         }
         async getPageBlocks() {
             let rootDir = store_3.getRootDir();
-            let path = rootDir ? rootDir + "/scconfig.json" : "scconfig.json";
+            let path = rootDir ? rootDir + '/scconfig.json' : 'scconfig.json';
             let pageBlocks = [];
             try {
                 let content = await components_5.application.getContent(path);
@@ -564,9 +590,10 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
                     command: (builder, userInputData) => {
                         return {
                             execute: () => {
+                                console.log('--------- Settings command: ', builder, userInputData);
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(userInputData);
-                                this.setData(userInputData);
+                                this.setData(Object.assign(Object.assign({}, this.data), userInputData));
                             },
                             undo: () => {
                                 // if (builder?.setData) builder.setData(this.oldData);
@@ -593,14 +620,15 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         async renderContentBlocks() {
             // this.clearRows();
             for (let i = 0; i < this.data.numberOfBlocks; i++) {
-                const contentBlock = (this.$render("i-scom-single-content-block", { onClick: this.setContentBlock }));
+                const contentBlock = (this.$render("i-scom-single-content-block", { id: `single-content-block__${i}`, onClick: this.setContentBlock }));
                 this.contentBlocks.push(contentBlock);
                 this.pnlContentBlocks.append(contentBlock);
             }
         }
         resetActions() {
             this.activeActions = null;
-            this.activeContentBlock.classList.remove('active');
+            if (this.activeContentBlock)
+                this.activeContentBlock.classList.remove('active');
             components_5.application.EventBus.dispatch(const_4.EVENT.ON_UPDATE_TOOLBAR);
         }
         render() {

@@ -39,7 +39,7 @@ export interface PageBlock {
 export interface IPageBlockData {
   name: string;
   path: string;
-  category?: "components" | "micro-dapps";
+  category?: 'components' | 'micro-dapps';
   imgUrl?: string;
   disableClicked?: boolean;
   shownBackdrop?: boolean;
@@ -47,6 +47,7 @@ export interface IPageBlockData {
 
 export interface IContentBlock {
   numberOfBlocks?: number;
+  dataProperties: IPageElement[];
 }
 
 export interface IElementConfig {
