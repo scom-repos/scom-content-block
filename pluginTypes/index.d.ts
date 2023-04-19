@@ -2,7 +2,6 @@
 declare module "@scom/scom-content-block/const.ts" {
     export const EVENT: {
         ON_ADD_ELEMENT_CONTENT_BLOCK: string;
-        ON_APPEND_MODULE_CONTENT_BLOCK: string;
         ON_SET_ACTION_BLOCK: string;
         ON_UPDATE_TOOLBAR: string;
     };
@@ -163,7 +162,7 @@ declare module "@scom/scom-content-block/contentBlock.tsx" {
         initEventBus(): void;
         private onAddElement;
         private setModule;
-        fetchModule(element: IPageElement): Promise<void>;
+        fetchModule(element: IPageElement, setActions?: boolean): Promise<void>;
         getEmbedElement: (path: string) => Promise<HTMLElement>;
         private onOpenSelector;
         render(): any;

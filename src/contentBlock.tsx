@@ -76,11 +76,10 @@ export default class ScomSingleContentBlock extends Module {
         },
       };
     }
-    await this.fetchModule(element);
-    if (this._component.setData) await this._component.setData(element.properties);
+    await this.fetchModule(element, true);
   }
 
-  private async setModule(module: Module, element: IPageElement) {
+  private async setModule(module: Module, element: IPageElement, setActions = false) {
     this._component = module;
     this._component.parent = this.pnlContentBlock;
     this.pnlContentBlock.append(this._component);
@@ -95,11 +94,12 @@ export default class ScomSingleContentBlock extends Module {
     this._component.style.display = 'block';
 
     const id = this.id;
-    application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {
-      id,
-      element,
-      actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
-    });
+    if (setActions)
+      application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {
+        id,
+        element,
+        actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
+      });
     this._component.addEventListener('click', (event: Event) => {
       event.preventDefault();
       application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {
@@ -112,12 +112,13 @@ export default class ScomSingleContentBlock extends Module {
     this.pnlContentBlock.visible = true;
   }
 
-  async fetchModule(element: IPageElement) {
+  async fetchModule(element: IPageElement, setActions = false) {
     console.log('fetchModule: ', element);
     try {
       const module: any = await this.getEmbedElement(element?.module?.path || '');
       if (!module) throw new Error('Element not found');
-      await this.setModule(module, element);
+      await this.setModule(module, element, setActions);
+      if (this._component.setData) await this._component.setData(element.properties);
       // if (this.isTexbox()) {
       //   this.dragStack.visible = true;
       //   this.contentStack.classList.remove('move');
