@@ -368,11 +368,9 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
                     },
                 };
             }
-            await this.fetchModule(element);
-            if (this._component.setData)
-                await this._component.setData(element.properties);
+            await this.fetchModule(element, true);
         }
-        async setModule(module, element) {
+        async setModule(module, element, setActions = false) {
             this._component = module;
             this._component.parent = this.pnlContentBlock;
             this.pnlContentBlock.append(this._component);
@@ -387,11 +385,12 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
             this._component.overflow = 'hidden';
             this._component.style.display = 'block';
             const id = this.id;
-            components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, {
-                id,
-                element,
-                actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
-            });
+            if (setActions)
+                components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, {
+                    id,
+                    element,
+                    actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
+                });
             this._component.addEventListener('click', (event) => {
                 event.preventDefault();
                 components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, {
@@ -403,14 +402,16 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
             this.pnlEmpty.visible = false;
             this.pnlContentBlock.visible = true;
         }
-        async fetchModule(element) {
+        async fetchModule(element, setActions = false) {
             var _a;
             console.log('fetchModule: ', element);
             try {
                 const module = await this.getEmbedElement(((_a = element === null || element === void 0 ? void 0 : element.module) === null || _a === void 0 ? void 0 : _a.path) || '');
                 if (!module)
                     throw new Error('Element not found');
-                await this.setModule(module, element);
+                await this.setModule(module, element, setActions);
+                if (this._component.setData)
+                    await this._component.setData(element.properties);
                 // if (this.isTexbox()) {
                 //   this.dragStack.visible = true;
                 //   this.contentStack.classList.remove('move');

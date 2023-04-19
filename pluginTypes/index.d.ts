@@ -162,7 +162,7 @@ declare module "@scom/scom-content-block/contentBlock.tsx" {
         initEventBus(): void;
         private onAddElement;
         private setModule;
-        fetchModule(element: IPageElement): Promise<void>;
+        fetchModule(element: IPageElement, setActions?: boolean): Promise<void>;
         getEmbedElement: (path: string) => Promise<HTMLElement>;
         private onOpenSelector;
         render(): any;
