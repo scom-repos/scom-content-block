@@ -31,7 +31,7 @@ declare global {
 @customElements('i-scom-content-block')
 export default class ScomContentBlock extends Module implements PageBlock {
   private pnlContentBlocks: Panel;
-
+  private _elementId: string;
   private contentBlocks: ScomSingleContentBlock[] = [];
   private activeContentBlock: ScomSingleContentBlock;
   private activeActions: any;
@@ -59,7 +59,6 @@ export default class ScomContentBlock extends Module implements PageBlock {
     super.init();
     this.initEventBus();
     this.setPageBlocks();
-    this.renderContentBlocks();
 
     document.addEventListener('click', e => {
       // Clicked outside the content-block
@@ -76,8 +75,8 @@ export default class ScomContentBlock extends Module implements PageBlock {
     application.EventBus.register(
       this,
       EVENT.ON_SET_ACTION_BLOCK,
-      (data: {id: string; element: IPageElement; actions: any}) => {
-        const {id, element, actions} = data;
+      (data: {id: string; element: IPageElement; elementId: string; actions: any}) => {
+        const {id, element, elementId, actions} = data;
         this.activeActions = actions;
         this.isBlockActive = true;
         application.EventBus.dispatch(EVENT.ON_UPDATE_TOOLBAR);
@@ -113,13 +112,23 @@ export default class ScomContentBlock extends Module implements PageBlock {
         const contentBlock = (
           <i-scom-single-content-block
             id={`single-content-block__${initIndex + i}`}
+            rootId={this.getElementId()}
             onClick={this.setContentBlock}></i-scom-single-content-block>
         ) as ScomSingleContentBlock;
         this.contentBlocks.push(contentBlock);
         this.pnlContentBlocks.append(contentBlock);
       }
     }
-    this.data.dataProperties.length = this.data.numberOfBlocks;
+    if (this.data.dataProperties) this.data.dataProperties.length = this.data.numberOfBlocks;
+  }
+
+  getElementId() {
+    return this._elementId;
+  }
+
+  setElementId(id: string) {
+    this._elementId = id;
+    this.renderContentBlocks();
   }
 
   getTag() {
@@ -234,6 +243,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
       const contentBlock = (
         <i-scom-single-content-block
           id={`single-content-block__${i}`}
+          rootId={this.getElementId()}
           onClick={this.setContentBlock}></i-scom-single-content-block>
       ) as ScomSingleContentBlock;
       this.contentBlocks.push(contentBlock);

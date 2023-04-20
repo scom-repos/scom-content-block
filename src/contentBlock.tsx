@@ -12,7 +12,9 @@ interface IGetModuleOptions {
   localPath?: string;
 }
 
-interface ScomSingleContentBlockElement extends ControlElement {}
+interface ScomSingleContentBlockElement extends ControlElement {
+  rootId: string;
+}
 
 declare global {
   namespace JSX {
@@ -29,6 +31,7 @@ export default class ScomSingleContentBlock extends Module {
   private pnlContentBlock: Panel;
   private mdSelector: ScomContentBlockSelector;
   private _component: any = null;
+  private rootId: string;
 
   defaultEdit: boolean = true;
   private uuid: string;
@@ -38,6 +41,7 @@ export default class ScomSingleContentBlock extends Module {
 
   init() {
     super.init();
+    this.rootId = this.getAttribute('rootId', true, '');
     this.initEventBus();
 
     // this.addEventListener('mouseenter', e => {
@@ -97,6 +101,7 @@ export default class ScomSingleContentBlock extends Module {
     if (setActions)
       application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {
         id,
+        elementId: this.rootId,
         element,
         actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
       });
@@ -104,6 +109,7 @@ export default class ScomSingleContentBlock extends Module {
       event.preventDefault();
       application.EventBus.dispatch(EVENT.ON_SET_ACTION_BLOCK, {
         id,
+        elementId: this.rootId,
         element,
         actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
       });
