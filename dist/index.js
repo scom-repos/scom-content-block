@@ -332,6 +332,8 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
         }
         init() {
             super.init();
+            this.rootId = this.getAttribute('rootId', true, '');
+            console.log('========= each: ', this.rootId);
             this.initEventBus();
             // this.addEventListener('mouseenter', e => {
             //   console.log('this.id: ', this.id);
@@ -388,6 +390,7 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
             if (setActions)
                 components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, {
                     id,
+                    elementId: this.rootId,
                     element,
                     actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
                 });
@@ -395,6 +398,7 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
                 event.preventDefault();
                 components_4.application.EventBus.dispatch(const_3.EVENT.ON_SET_ACTION_BLOCK, {
                     id,
+                    elementId: this.rootId,
                     element,
                     actions: this._component.getActions ? this._component.getActions.bind(this._component) : () => [],
                 });
@@ -463,7 +467,6 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
             super.init();
             this.initEventBus();
             this.setPageBlocks();
-            this.renderContentBlocks();
             document.addEventListener('click', e => {
                 // Clicked outside the content-block
                 if (!this.contains(e.target))
@@ -477,7 +480,7 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         }
         initEventBus() {
             components_5.application.EventBus.register(this, const_4.EVENT.ON_SET_ACTION_BLOCK, (data) => {
-                const { id, element, actions } = data;
+                const { id, element, elementId, actions } = data;
                 this.activeActions = actions;
                 this.isBlockActive = true;
                 components_5.application.EventBus.dispatch(const_4.EVENT.ON_UPDATE_TOOLBAR);
@@ -508,12 +511,21 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
             else {
                 const initIndex = this.contentBlocks.length;
                 for (let i = 0; i < Math.abs(delta); i++) {
-                    const contentBlock = (this.$render("i-scom-single-content-block", { id: `single-content-block__${initIndex + i}`, onClick: this.setContentBlock }));
+                    const contentBlock = (this.$render("i-scom-single-content-block", { id: `single-content-block__${initIndex + i}`, rootId: this.getElementId(), onClick: this.setContentBlock }));
                     this.contentBlocks.push(contentBlock);
                     this.pnlContentBlocks.append(contentBlock);
                 }
             }
-            this.data.dataProperties.length = this.data.numberOfBlocks;
+            if (this.data.dataProperties)
+                this.data.dataProperties.length = this.data.numberOfBlocks;
+        }
+        getElementId() {
+            return this._elementId;
+        }
+        setElementId(id) {
+            console.log('setElementId: ', id);
+            this._elementId = id;
+            this.renderContentBlocks();
         }
         getTag() {
             return this.tag;
@@ -614,8 +626,9 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         }
         async renderContentBlocks() {
             // this.clearRows();
+            console.log('renderContentBlocks: ', this.getElementId());
             for (let i = 0; i < this.data.numberOfBlocks; i++) {
-                const contentBlock = (this.$render("i-scom-single-content-block", { id: `single-content-block__${i}`, onClick: this.setContentBlock }));
+                const contentBlock = (this.$render("i-scom-single-content-block", { id: `single-content-block__${i}`, rootId: this.getElementId(), onClick: this.setContentBlock }));
                 this.contentBlocks.push(contentBlock);
                 this.pnlContentBlocks.append(contentBlock);
             }

@@ -142,6 +142,7 @@ declare module "@scom/scom-content-block/contentBlock.tsx" {
     import { IPageElement } from "@scom/scom-content-block/interface.ts";
     import "@scom/scom-content-block/index.css.ts";
     interface ScomSingleContentBlockElement extends ControlElement {
+        rootId: string;
     }
     global {
         namespace JSX {
@@ -155,6 +156,7 @@ declare module "@scom/scom-content-block/contentBlock.tsx" {
         private pnlContentBlock;
         private mdSelector;
         private _component;
+        private rootId;
         defaultEdit: boolean;
         private uuid;
         constructor(parent?: Container, options?: any);
@@ -185,6 +187,7 @@ declare module "@scom/scom-content-block" {
     }
     export default class ScomContentBlock extends Module implements PageBlock {
         private pnlContentBlocks;
+        private _elementId;
         private contentBlocks;
         private activeContentBlock;
         private activeActions;
@@ -204,6 +207,8 @@ declare module "@scom/scom-content-block" {
         static create(options?: ScomContentBlockElement, parent?: Container): Promise<ScomContentBlock>;
         getData(): IContentBlock;
         setData(value: IContentBlock): Promise<void>;
+        getElementId(): string;
+        setElementId(id: string): void;
         getTag(): any;
         setTag(value: any): Promise<void>;
         setRootDir(value: string): void;
