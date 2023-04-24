@@ -333,7 +333,6 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
         init() {
             super.init();
             this.rootId = this.getAttribute('rootId', true, '');
-            console.log('========= each: ', this.rootId);
             this.initEventBus();
             // this.addEventListener('mouseenter', e => {
             //   console.log('this.id: ', this.id);
@@ -523,7 +522,6 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
             return this._elementId;
         }
         setElementId(id) {
-            console.log('setElementId: ', id);
             this._elementId = id;
             this.renderContentBlocks();
         }
@@ -567,7 +565,7 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
                 properties: {
                     numberOfBlocks: {
                         type: 'number',
-                        default: 3,
+                        default: this.data.numberOfBlocks,
                         maximum: 10,
                     },
                 },
@@ -626,7 +624,6 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
         }
         async renderContentBlocks() {
             // this.clearRows();
-            console.log('renderContentBlocks: ', this.getElementId());
             for (let i = 0; i < this.data.numberOfBlocks; i++) {
                 const contentBlock = (this.$render("i-scom-single-content-block", { id: `single-content-block__${i}`, rootId: this.getElementId(), onClick: this.setContentBlock }));
                 this.contentBlocks.push(contentBlock);
