@@ -93,7 +93,6 @@ declare module "@scom/scom-content-block/store.ts" {
     export const getRootDir: () => string;
     export const setPageBlocks: (value: IPageBlockData[]) => void;
     export const getPageBlocks: () => any[];
-    export const getDappContainer: () => any;
 }
 /// <amd-module name="@scom/scom-content-block/selector.tsx" />
 declare module "@scom/scom-content-block/selector.tsx" {

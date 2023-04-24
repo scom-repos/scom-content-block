@@ -1,9 +1,9 @@
-import {Module, customModule, Panel, customElements, ControlElement, Container, application} from '@ijstech/components';
-import {ELEMENT_NAME, EVENT} from './const';
-import {IElementConfig, IPageElement} from './interface';
+import { Module, customModule, Panel, customElements, ControlElement, Container, application } from '@ijstech/components';
+import { ELEMENT_NAME, EVENT } from './const';
+import { IElementConfig, IPageElement } from './interface';
 import ScomContentBlockSelector from './selector';
-import {getDappContainer, getRootDir} from './store';
-import {generateUUID} from './utility';
+import { getRootDir } from './store';
+import { generateUUID } from './utility';
 
 import './index.css';
 
@@ -57,7 +57,7 @@ export default class ScomSingleContentBlock extends Module {
   }
 
   private async onAddElement(data: IElementConfig) {
-    const {type, module} = data;
+    const { type, module } = data;
     let element: IPageElement = {
       id: generateUUID(),
       column: 1,
@@ -67,17 +67,16 @@ export default class ScomSingleContentBlock extends Module {
       properties: {} as any,
     };
     if (module.path === 'scom-nft-minter' || module.path === 'scom-gem-token') {
-      element.module = getDappContainer();
+      element.module = module;
       element.columnSpan = 6;
       element.properties = {
-        networks: [43113],
-        wallets: ['metamask'],
-        content: {
-          module: {...module, localPath: `libs/@scom/${module.path}`},
-          properties: {
-            width: '100%',
-          },
-        },
+        networks: [{
+          chainId: 43113
+        }],
+        wallets: [{
+          name: "metamask"
+        }],
+        width: '100%'
       };
     }
     await this.fetchModule(element, true);

@@ -45,7 +45,7 @@ define("@scom/scom-content-block/selector.css.ts", ["require", "exports", "@ijst
 define("@scom/scom-content-block/store.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getDappContainer = exports.getPageBlocks = exports.setPageBlocks = exports.getRootDir = exports.setRootDir = exports.state = void 0;
+    exports.getPageBlocks = exports.setPageBlocks = exports.getRootDir = exports.setRootDir = exports.state = void 0;
     exports.state = {
         pageBlocks: [],
         rootDir: '',
@@ -66,10 +66,6 @@ define("@scom/scom-content-block/store.ts", ["require", "exports"], function (re
         return exports.state.pageBlocks || [];
     };
     exports.getPageBlocks = getPageBlocks;
-    const getDappContainer = () => {
-        return (exports.state.pageBlocks || []).find(pageblock => pageblock.path === 'scom-dapp-container');
-    };
-    exports.getDappContainer = getDappContainer;
 });
 define("@scom/scom-content-block/selector.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-content-block/store.ts", "@scom/scom-content-block/const.ts", "@scom/scom-content-block/selector.css.ts"], function (require, exports, components_2, store_1, const_1) {
     "use strict";
@@ -356,17 +352,16 @@ define("@scom/scom-content-block/contentBlock.tsx", ["require", "exports", "@ijs
                 properties: {},
             };
             if (module.path === 'scom-nft-minter' || module.path === 'scom-gem-token') {
-                element.module = store_2.getDappContainer();
+                element.module = module;
                 element.columnSpan = 6;
                 element.properties = {
-                    networks: [43113],
-                    wallets: ['metamask'],
-                    content: {
-                        module: Object.assign(Object.assign({}, module), { localPath: `libs/@scom/${module.path}` }),
-                        properties: {
-                            width: '100%',
-                        },
-                    },
+                    networks: [{
+                            chainId: 43113
+                        }],
+                    wallets: [{
+                            name: "metamask"
+                        }],
+                    width: '100%'
                 };
             }
             await this.fetchModule(element, true);

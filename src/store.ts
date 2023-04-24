@@ -20,7 +20,3 @@ export const setPageBlocks = (value: IPageBlockData[]) => {
 export const getPageBlocks = () => {
   return state.pageBlocks || [];
 };
-
-export const getDappContainer = () => {
-  return (state.pageBlocks || []).find(pageblock => pageblock.path === 'scom-dapp-container');
-};
