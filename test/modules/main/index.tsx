@@ -11,7 +11,7 @@ export class MainModule extends Module {
 
   init() {
     super.init();
-    // if (this.options.data) this.contentBlock.setData(this.options.data);
+    this.contentBlock.setElementId("elm-0");
   }
 
   render() {

@@ -7,10 +7,10 @@
     }
   },
   "dependencies": {
-    "@ijstech/eth-contract": "*",
-    "@ijstech/eth-wallet": "*",
     "@scom/scom-network-list": "*",
     "@scom/scom-token-list": "*",
+    "@scom/scom-network-picker": "*",
+    "@scom/scom-dapp-container": "*",
     "@scom/scom-content-block": "*"
   },
   "components": {

@@ -23,6 +23,7 @@
     "@scom/scom-randomizer": "https://github.com/scom-repos/scom-randomizer",
     "@scom/scom-video": "https://github.com/scom-repos/scom-video",
     "@scom/scom-map": "https://github.com/scom-repos/scom-map",
+    "@scom/scom-network-picker": "^0.1.0",
     "@scom/scom-network-list": "^0.1.0",
     "@scom/scom-token-list": "https://github.com/scom-repos/scom-token-list"
   },
