@@ -176,7 +176,7 @@ export default class ScomContentBlock extends Module implements PageBlock {
       properties: {
         numberOfBlocks: {
           type: 'number',
-          default: 3,
+          default: this.data.numberOfBlocks,
           maximum: 10,
         },
       },
