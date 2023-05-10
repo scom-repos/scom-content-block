@@ -607,6 +607,30 @@ define("@scom/scom-content-block", ["require", "exports", "@ijstech/components",
             ];
             return actions;
         }
+        getConfigurators() {
+            return [
+                {
+                    name: 'Builder Configurator',
+                    target: 'Builders',
+                    getActions: this.getActions.bind(this),
+                    getData: this.getData.bind(this),
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this),
+                    getElementId: this.getElementId.bind(this),
+                    setElementId: this.setElementId.bind(this),
+                    setRootDir: this.setRootDir.bind(this)
+                },
+                {
+                    name: 'Emdedder Configurator',
+                    target: 'Embedders',
+                    getData: this.getData.bind(this),
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
+                }
+            ];
+        }
         setContentBlock(activeContentBlock) {
             this.activeContentBlock = activeContentBlock;
             const contentBlocks = document.querySelectorAll('i-scom-single-content-block');

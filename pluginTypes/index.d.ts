@@ -171,8 +171,8 @@ declare module "@scom/scom-content-block/contentBlock.tsx" {
 }
 /// <amd-module name="@scom/scom-content-block" />
 declare module "@scom/scom-content-block" {
-    import { Module, ControlElement, Container, IDataSchema } from '@ijstech/components';
-    import { IContentBlock, IPageBlockData, PageBlock } from "@scom/scom-content-block/interface.ts";
+    import { Module, ControlElement, Container } from '@ijstech/components';
+    import { IContentBlock } from "@scom/scom-content-block/interface.ts";
     import "@scom/scom-content-block/index.css.ts";
     interface ScomContentBlockElement extends ControlElement {
         numberOfBlocks?: number;
@@ -184,7 +184,7 @@ declare module "@scom/scom-content-block" {
             }
         }
     }
-    export default class ScomContentBlock extends Module implements PageBlock {
+    export default class ScomContentBlock extends Module {
         private pnlContentBlocks;
         private _elementId;
         private contentBlocks;
@@ -202,32 +202,46 @@ declare module "@scom/scom-content-block" {
         discard: () => Promise<void>;
         constructor(parent?: Container, options?: any);
         init(): void;
-        initEventBus(): void;
+        private initEventBus;
         static create(options?: ScomContentBlockElement, parent?: Container): Promise<ScomContentBlock>;
-        getData(): IContentBlock;
-        setData(value: IContentBlock): Promise<void>;
-        getElementId(): string;
-        setElementId(id: string): void;
-        getTag(): any;
-        setTag(value: any): Promise<void>;
-        setRootDir(value: string): void;
-        setPageBlocks(): Promise<void>;
-        getPageBlocks(): Promise<IPageBlockData[]>;
+        private getData;
+        private setData;
+        private getElementId;
+        private setElementId;
+        private getTag;
+        private setTag;
+        private setRootDir;
+        private setPageBlocks;
+        private getPageBlocks;
         checkValidation(value: IContentBlock): boolean;
-        getActions(): any;
-        _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema): {
+        private getActions;
+        private _getActions;
+        getConfigurators(): ({
             name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => void;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-        }[];
+            target: string;
+            getActions: any;
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            getElementId: any;
+            setElementId: any;
+            setRootDir: any;
+        } | {
+            name: string;
+            target: string;
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            getActions?: undefined;
+            getElementId?: undefined;
+            setElementId?: undefined;
+            setRootDir?: undefined;
+        })[];
         private setContentBlock;
-        renderContentBlocks(): Promise<void>;
-        resetActions(): void;
+        private renderContentBlocks;
+        private resetActions;
         render(): any;
     }
 }
